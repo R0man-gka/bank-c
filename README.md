@@ -33,4 +33,4 @@ gcc main.c Bank.c -o bank
 - `Bank.h` — структуры и объявления
 
 ## Автор
-Rorogka
+R0man-gka (Rorogka)
