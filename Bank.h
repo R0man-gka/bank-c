@@ -1,0 +1,38 @@
+#ifndef BANK_H
+#define BANK_H
+#define ACCOUNTS_FILE "accounts.dat"
+
+struct Bank_account{
+    char login[50];
+    int pin_code;
+};
+
+enum account_type {
+    SAVINGS = 1,
+    CHECKING,
+    SOCIAL,
+};
+
+struct Account {
+    char name[50];
+    int id;
+    int balance;
+    enum account_type type;
+};
+
+struct User {
+    struct Bank_account bank_info; 
+    struct Account acct;           
+};
+
+void deposit(struct User *user);
+void withdraw(struct User *user);
+void account_info(struct Account acct);
+void bank_account_create(struct User *user);
+void account_create(struct Account *acct, int id);
+void save_user_changes(struct User *user);
+int authorization(struct User *user);
+
+
+
+#endif
