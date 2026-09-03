@@ -2,24 +2,25 @@
 #include <string.h>
 #include "Bank.h"
 
-
-void deposit(struct User *user){
+void deposit(struct User *user, int idx){
     int pl;
     printf("Введите сумму пополнения:\n ");
-    scanf("%d",&pl);
-    user->acct.balance += pl;
-    printf("Balance: %d\n", user->acct.balance);
+    scanf("%d", &pl);
+    user->accounts[idx].balance += pl;
+    printf("Balance: %d\n", user->accounts[idx].balance);
 }
 
-void withdraw(struct User *user){
+void withdraw(struct User *user, int idx){
     int sl;
-    printf("Ввидите сумму которую хотите снять:\n");
-    scanf("%d",&sl);
-    if (sl > user->acct.balance) {
-    printf("Не достаточно средств!\n");
+    printf("Введите сумму которую хотите снять:\n");
+    scanf("%d", &sl);
+    if (sl > user->accounts[idx].balance){
+        printf("Не достаточно средств!\n");
     }
-    else user->acct.balance -= sl;
-    printf("Balance: %d\n", user->acct.balance);
+    else {
+        user->accounts[idx].balance -= sl;
+    }
+    printf("Balance: %d\n", user->accounts[idx].balance);
 }
 
 void account_info(struct Account acct){
@@ -43,40 +44,75 @@ void account_create(struct Account *acct, int id){
     printf("Какой тип счёта (SAVINGS-1, CHECKING-2, SOCIAL-3):\n");
     scanf("%d", &acct->type);
 }
+
 void bank_account_create(struct User *user){
+    user->accounts_count = 0;   
+
     printf("Придумайте Login:\n");
     scanf("%s", user->bank_info.login);
     printf("Введите pin-code:\n");
     scanf("%d", &user->bank_info.pin_code);
 
-    account_create(&user->acct, 1);
+    account_create(&user->accounts[user->accounts_count], user->accounts_count + 1);
+    user->accounts_count++;
 
     FILE *f = fopen(ACCOUNTS_FILE, "ab");
     fwrite(user, sizeof(struct User), 1, f);
     fclose(f);
 }
+
 void save_user_changes(struct User *user){
     FILE *f = fopen(ACCOUNTS_FILE, "rb");
     struct User temp;
     long pos;
     int found = 0;
     while (1){
-        pos = ftell(f);                              // запоминаем позицию ПЕРЕД чтением
+        pos = ftell(f);                              
         if (fread(&temp, sizeof(struct User), 1, f) != 1) break; // файл закончился
 
         if (strcmp(temp.bank_info.login, user->bank_info.login) == 0){
             found = 1;
-            break;                                    // нашли нужную запись, позиция запомнена в pos
+            break;                                    
         }
     }
     fclose(f);
     if (found){
-        FILE *f2 = fopen(ACCOUNTS_FILE, "r+b");        // открываем для чтения И записи
-        fseek(f2, pos, SEEK_SET);                       // перемещаемся на позицию нужной записи
-        fwrite(user, sizeof(struct User), 1, f2);        // затираем её новыми данными
+        FILE *f2 = fopen(ACCOUNTS_FILE, "r+b");        
+        fseek(f2, pos, SEEK_SET);                       
+        fwrite(user, sizeof(struct User), 1, f2);        
         fclose(f2);
     }
 }
+
+int choice_account(struct User *user){
+    printf("Выберите счёт:\n");
+    for (int i = 0; i < user->accounts_count; i++){
+        printf("%d. %s (баланс: %d)\n", i + 1, user->accounts[i].name, user->accounts[i].balance);
+    }
+    printf("0. Для создания нового счёта\n");
+    printf("------------------------\n");
+
+    int choice;
+    scanf("%d", &choice);
+
+    if (choice == 0 && user->accounts_count < MAX_ACCOUNTS_PER_USER){
+        account_create(&user->accounts[user->accounts_count], user->accounts_count + 1);
+        user->accounts_count++;
+        save_user_changes(user);
+        return user->accounts_count - 1; 
+    }
+    else if (choice == 0 && user->accounts_count >= MAX_ACCOUNTS_PER_USER){
+        printf("Достигнут лимит счетов для пользователя.\n");
+        return -1; 
+    }
+    else if (choice < 1 || choice > user->accounts_count){
+        printf("Неверный выбор.\n");
+        return -1; 
+    }
+
+    return choice - 1;   
+}
+
 int authorization(struct User *user){
     printf("Ввидите login:\n");
     scanf("%s", user->bank_info.login);
@@ -89,7 +125,7 @@ int authorization(struct User *user){
     while (fread(&temp, sizeof(struct User), 1, f)== 1){
         if (strcmp(temp.bank_info.login, user->bank_info.login) == 0 &&
             temp.bank_info.pin_code == user->bank_info.pin_code){
-            user->acct = temp.acct;   
+            *user = temp;
             fclose(f);
             return 1;
         }

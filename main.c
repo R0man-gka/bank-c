@@ -19,13 +19,14 @@ int main (void) {
         int ok = authorization(&user);
         if (ok == 1){
             printf("------------------------\n");
-            account_info(user.acct);
+            int idx = choice_account(&user);
+            account_info(user.accounts[idx]);
             printf("------------------------\n");
             printf("1-Пополнить / 2-Снять / 3-Выход\n");
             scanf("%d", &b);
             switch (b) {
-            case 1: deposit(&user); break;
-            case 2: withdraw(&user); break;
+            case 1: deposit(&user,idx); break;
+            case 2: withdraw(&user,idx); break;
             case 3: return 0;
             }
             save_user_changes(&user);
@@ -34,18 +35,18 @@ int main (void) {
     if (a == 2) {
         bank_account_create(&user);
         printf("------------------------\n");
-        account_info(user.acct);
+        int idx = 0;
+        
+        account_info(user.accounts[idx]);
         printf("------------------------\n");
         printf("1-Пополнить / 2-Снять / 3-Выход\n");
         scanf("%d", &b);
         switch (b) {
-        case 1: deposit(&user); break;
-        case 2: withdraw(&user); break;
+        case 1: deposit(&user,idx); break;
+        case 2: withdraw(&user,idx); break;
         case 3: return 0;
         }   
         save_user_changes(&user);
     }
-
-    
     return 0;
 }
