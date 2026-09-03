@@ -30,7 +30,7 @@ struct User {
 void deposit(struct User *user, int idx);
 void withdraw(struct User *user, int idx);
 void account_info(struct Account acct);
-void bank_account_create(struct User *user);
+int bank_account_create(struct User *user);
 void account_create(struct Account *acct, int id);
 void save_user_changes(struct User *user);
 int choice_account(struct User *user);

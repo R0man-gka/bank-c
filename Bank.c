@@ -45,20 +45,36 @@ void account_create(struct Account *acct, int id){
     scanf("%d", &acct->type);
 }
 
-void bank_account_create(struct User *user){
+int bank_account_create(struct User *user){
     user->accounts_count = 0;   
 
     printf("Придумайте Login:\n");
     scanf("%s", user->bank_info.login);
+
+    struct User temp;
+    FILE *f = fopen(ACCOUNTS_FILE, "rb");
+
+    if (f != NULL){
+        while (fread(&temp, sizeof(struct User), 1, f) == 1){
+            if (strcmp(temp.bank_info.login, user->bank_info.login) == 0){
+                printf("Аккаунт с таким логином уже существует.\n");
+                fclose(f);
+                return 1;
+            }
+        }
+        fclose(f);
+    }
+
     printf("Введите pin-code:\n");
     scanf("%d", &user->bank_info.pin_code);
 
     account_create(&user->accounts[user->accounts_count], user->accounts_count + 1);
     user->accounts_count++;
 
-    FILE *f = fopen(ACCOUNTS_FILE, "ab");
-    fwrite(user, sizeof(struct User), 1, f);
-    fclose(f);
+    FILE *r = fopen(ACCOUNTS_FILE, "ab");
+    fwrite(user, sizeof(struct User), 1, r);
+    fclose(r);
+    return 0;
 }
 
 void save_user_changes(struct User *user){

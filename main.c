@@ -33,7 +33,10 @@ int main (void) {
         }
     }
     if (a == 2) {
-        bank_account_create(&user);
+        int no = bank_account_create(&user);
+        if (no == 1){
+            return 0;
+        }
         printf("------------------------\n");
         int idx = 0;
         
