@@ -39,7 +39,7 @@ void account_info(struct Account acct){
 void account_create(struct Account *acct, int id){
     acct->id = id;
     acct->balance = 0;   
-    printf("Ввидите имя счёта:\n");
+    printf("Введите имя счёта:\n");
     scanf("%s", acct->name);
     printf("Какой тип счёта (SAVINGS-1, CHECKING-2, SOCIAL-3):\n");
     scanf("%d", &acct->type);
@@ -130,9 +130,9 @@ int choice_account(struct User *user){
 }
 
 int authorization(struct User *user){
-    printf("Ввидите login:\n");
+    printf("Введите login:\n");
     scanf("%s", user->bank_info.login);
-    printf("Ввидите pin-code:\n");
+    printf("Введите pin-code:\n");
     scanf("%d", &user->bank_info.pin_code);
 
     struct User temp;
