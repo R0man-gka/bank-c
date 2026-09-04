@@ -147,6 +147,17 @@ int authorization(struct User *user){
         }
     }
     printf("Аккаунт не найден\n");
-    fclose(f); 
+    fclose( f); 
     return 0;
+}
+
+void menu(struct User *user, int idx){
+    int b = 0;
+    printf("1-Пополнить / 2-Снять / 3-Выход\n");
+    scanf("%d", &b);
+    switch (b) {
+        case 1: deposit(user,idx); break;
+        case 2: withdraw(user,idx); break;
+        case 3: return;
+    }
 }
