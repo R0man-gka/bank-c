@@ -33,7 +33,7 @@ void account_info(struct Account acct);
 int bank_account_create(struct User *user);
 void account_create(struct Account *acct, int id);
 void save_user_changes(struct User *user);
-void menu(struct User *user, int idx);
+int menu(struct User *user, int idx);
 int choice_account(struct User *user);
 int authorization(struct User *user);
 

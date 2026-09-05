@@ -79,6 +79,12 @@ int bank_account_create(struct User *user){
 
 void save_user_changes(struct User *user){
     FILE *f = fopen(ACCOUNTS_FILE, "rb");
+    
+    if (f == NULL){
+        printf("Не удалось открыть файл для сохранения.\n");
+        return;
+    }
+
     struct User temp;
     long pos;
     int found = 0;
@@ -93,7 +99,13 @@ void save_user_changes(struct User *user){
     }
     fclose(f);
     if (found){
-        FILE *f2 = fopen(ACCOUNTS_FILE, "r+b");        
+        FILE *f2 = fopen(ACCOUNTS_FILE, "r+b"); 
+        
+        if (f2 == NULL){
+            printf("Не удалось открыть файл для записи.\n");
+            return;
+        }
+
         fseek(f2, pos, SEEK_SET);                       
         fwrite(user, sizeof(struct User), 1, f2);        
         fclose(f2);
@@ -138,6 +150,11 @@ int authorization(struct User *user){
     struct User temp;
     FILE *f = fopen(ACCOUNTS_FILE, "rb");
 
+    if (f == NULL){
+        printf("Файл с аккаунтами не найден. Сначала зарегистрируйтесь.\n");
+        return 0;
+    }
+
     while (fread(&temp, sizeof(struct User), 1, f)== 1){
         if (strcmp(temp.bank_info.login, user->bank_info.login) == 0 &&
             temp.bank_info.pin_code == user->bank_info.pin_code){
@@ -151,13 +168,14 @@ int authorization(struct User *user){
     return 0;
 }
 
-void menu(struct User *user, int idx){
+int menu(struct User *user, int idx){
     int b = 0;
     printf("1-Пополнить / 2-Снять / 3-Выход\n");
     scanf("%d", &b);
     switch (b) {
         case 1: deposit(user,idx); break;
         case 2: withdraw(user,idx); break;
-        case 3: return;
+        case 3: return 1;
     }
+    return 0;
 }
